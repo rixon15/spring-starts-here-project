@@ -3,12 +3,12 @@ package org.example.springstarterproject.model;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.Objects;
 
 @Embeddable
-@Getter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserRoleKey {

@@ -5,10 +5,10 @@ import com.example.models.ProjectRequest;
 import com.example.models.ProjectResponse;
 import com.example.models.TaskRequest;
 import com.example.models.TaskResponse;
+import org.example.springstarterproject.service.implementation.ProjectServiceImp;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,34 +16,49 @@ import java.util.List;
 @RequestMapping("/projects")
 public class ProjectController implements ProjectsApi {
 
+    private final ProjectServiceImp projectService;
+
+    public ProjectController(ProjectServiceImp projectService) {
+        this.projectService = projectService;
+    }
+
+    //Get list of projects
     @Override
     @GetMapping("/")
     public ResponseEntity<List<ProjectResponse>> projectsGet() {
-        return null;
+        return new ResponseEntity<>(projectService.getAllProjects(), HttpStatus.OK);
+
     }
 
+    @DeleteMapping("/{id}")
     @Override
-    public ResponseEntity<Void> projectsIdDelete(Long id) {
-        return null;
+    public ResponseEntity<Void> projectsIdDelete(@PathVariable Long id) {
+        projectService.deleteProject(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
+
+    @GetMapping("/{id}")
     @Override
-    public ResponseEntity<ProjectResponse> projectsIdGet(Long id) {
-        return null;
+    public ResponseEntity<ProjectResponse> projectsIdGet(@PathVariable Long id) {
+        return new ResponseEntity<>(projectService.getProjectById(id), HttpStatus.OK);
     }
 
+    @PostMapping("/")
     @Override
-    public ResponseEntity<ProjectResponse> projectsPost(ProjectRequest projectRequest) {
-        return null;
+    public ResponseEntity<ProjectResponse> projectsPost(@RequestBody ProjectRequest projectRequest) {
+        return new ResponseEntity<>(projectService.createProject(projectRequest), HttpStatus.CREATED);
     }
 
+    @GetMapping("/{id}/tasks")
     @Override
-    public ResponseEntity<List<TaskResponse>> projectsProjectIdTasksGet(Long projectId) {
-        return null;
+    public ResponseEntity<List<TaskResponse>> projectsProjectIdTasksGet(@PathVariable Long id) {
+        return new ResponseEntity<>(projectService.getAllTasks(id), HttpStatus.OK);
     }
 
+    @PostMapping("/{id}/tasks")
     @Override
-    public ResponseEntity<TaskResponse> projectsProjectIdTasksPost(Long projectId, TaskRequest taskRequest) {
-        return null;
+    public ResponseEntity<TaskResponse> projectsProjectIdTasksPost(@PathVariable Long id, TaskRequest taskRequest) {
+        return new ResponseEntity<>(projectService.createTaskInProject(id, taskRequest), HttpStatus.CREATED);
     }
 }

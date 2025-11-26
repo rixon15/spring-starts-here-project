@@ -20,7 +20,7 @@ CREATE TABLE tasks
     project_id  BIGINT                                  NOT NULL,
     assignee_id BIGINT,
     title       VARCHAR(255)                            NOT NULL,
-    status      SMALLINT                                NOT NULL,
+    status      VARCHAR(50)                             NOT NULL,
     due_date    TIMESTAMP WITHOUT TIME ZONE             NOT NULL,
     CONSTRAINT pk_tasks PRIMARY KEY (id)
 );

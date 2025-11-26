@@ -2,7 +2,7 @@ package org.example.springstarterproject.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import java.util.HashSet;
@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "roles")
-@Getter
+@Data
 @RequiredArgsConstructor
 public class Role {
 

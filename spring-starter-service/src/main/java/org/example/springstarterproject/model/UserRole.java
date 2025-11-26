@@ -1,13 +1,13 @@
 package org.example.springstarterproject.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 
 @Entity
-@Getter
+@Data
 @Table(name = "user_roles")
 @NoArgsConstructor
 public class UserRole {
