@@ -42,6 +42,9 @@ public class ProjectServiceImp implements ProjectService {
 
     @Override
     public void deleteProject(Long id) {
+
+        //TODO: User has to be the owner of the project
+
         projectRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
 
         projectRepository.deleteById(id);
@@ -78,6 +81,9 @@ public class ProjectServiceImp implements ProjectService {
 
     @Override
     public TaskResponse createTaskInProject(Long id, TaskRequest taskRequest) {
+
+        //TODO: If current user is not the owner of the project the task has to be created in
+
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(id));
 
