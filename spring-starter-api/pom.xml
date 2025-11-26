@@ -52,8 +52,8 @@
                             <apiPackage>com.example.api</apiPackage>
                             <modelPackage>com.example.models</modelPackage>
                             <generateSupportingFiles>false</generateSupportingFiles>
-<!--                            <generateModelTests>false</generateModelTests>-->
-<!--                            <generateApiTests>false</generateApiTests>-->
+                            <generateModelTests>false</generateModelTests>
+                            <generateApiTests>false</generateApiTests>
                             <configOptions>
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <interfaceOnly>true</interfaceOnly>

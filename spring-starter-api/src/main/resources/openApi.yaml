@@ -8,7 +8,6 @@ servers:
     description: Local Development Server
 
 # 1. GLOBAL SECURITY
-# By default, all endpoints require a Bearer Token (JWT)
 security:
   - bearerAuth: []
 
@@ -20,6 +19,7 @@ paths:
     post:
       summary: Register a new user
       description: Creates a new user account and returns a JWT token. Public endpoint.
+      operationId: registerUser # <--- METHOD NAME: registerUser(...)
       tags: [Authentication]
       security: []
       requestBody:
@@ -42,6 +42,7 @@ paths:
     post:
       summary: Login with credentials
       description: Exchange email and password for a JWT token. Public endpoint.
+      operationId: loginUser # <--- METHOD NAME: loginUser(...)
       tags: [Authentication]
       security: []
       requestBody:
@@ -64,8 +65,8 @@ paths:
     post:
       summary: Login via OAuth Provider
       description: |
-        Exchange an OAuth provider's ID token (e.g., from Google/GitHub) for an internal system JWT. 
-        This assumes the frontend handles the redirect and retrieves the provider token first.
+        Exchange an OAuth provider's ID token (e.g., from Google/GitHub) for an internal system JWT.
+      operationId: loginViaOAuth # <--- METHOD NAME: loginViaOAuth(...)
       tags: [Authentication]
       security: []
       requestBody:
@@ -90,6 +91,7 @@ paths:
   /users:
     get:
       summary: List all users
+      operationId: getAllUsers # <--- METHOD NAME: getAllUsers(...)
       tags: [Users]
       responses:
         '200':
@@ -104,6 +106,7 @@ paths:
   /users/{id}:
     get:
       summary: Get user by ID
+      operationId: getUserById # <--- METHOD NAME: getUserById(Long id)
       tags: [Users]
       parameters:
         - in: path
@@ -121,6 +124,7 @@ paths:
                 $ref: '#/components/schemas/UserResponse'
     put:
       summary: Update user profile
+      operationId: updateUser # <--- METHOD NAME: updateUser(Long id, UserUpdateRequest request)
       tags: [Users]
       parameters:
         - in: path
@@ -149,6 +153,7 @@ paths:
   /projects:
     get:
       summary: List projects
+      operationId: getAllProjects # <--- METHOD NAME: getAllProjects(...)
       tags: [Projects]
       responses:
         '200':
@@ -161,6 +166,7 @@ paths:
                   $ref: '#/components/schemas/ProjectResponse'
     post:
       summary: Create a project
+      operationId: createProject # <--- METHOD NAME: createProject(ProjectRequest request)
       tags: [Projects]
       requestBody:
         required: true
@@ -179,6 +185,7 @@ paths:
   /projects/{id}:
     get:
       summary: Get project details
+      operationId: getProjectById # <--- METHOD NAME: getProjectById(Long id)
       tags: [Projects]
       parameters:
         - in: path
@@ -196,6 +203,7 @@ paths:
                 $ref: '#/components/schemas/ProjectResponse'
     delete:
       summary: Delete project
+      operationId: deleteProject # <--- METHOD NAME: deleteProject(Long id)
       tags: [Projects]
       parameters:
         - in: path
@@ -214,6 +222,7 @@ paths:
   /projects/{projectId}/tasks:
     get:
       summary: List tasks for a specific project
+      operationId: getTasksByProjectId # <--- METHOD NAME: getTasksByProjectId(Long projectId)
       tags: [Tasks]
       parameters:
         - in: path
@@ -233,6 +242,7 @@ paths:
                   $ref: '#/components/schemas/TaskResponse'
     post:
       summary: Create a task in a project
+      operationId: createTask # <--- METHOD NAME: createTask(Long projectId, TaskRequest request)
       tags: [Tasks]
       parameters:
         - in: path
@@ -258,6 +268,7 @@ paths:
   /tasks/{id}:
     get:
       summary: Get task details
+      operationId: getTaskById # <--- METHOD NAME: getTaskById(Long id)
       tags: [Tasks]
       parameters:
         - in: path
@@ -275,6 +286,7 @@ paths:
                 $ref: '#/components/schemas/TaskResponse'
     put:
       summary: Update task details
+      operationId: updateTask # <--- METHOD NAME: updateTask(Long id, TaskRequest request)
       tags: [Tasks]
       parameters:
         - in: path
@@ -298,6 +310,7 @@ paths:
                 $ref: '#/components/schemas/TaskResponse'
     delete:
       summary: Delete task
+      operationId: deleteTask # <--- METHOD NAME: deleteTask(Long id)
       tags: [Tasks]
       parameters:
         - in: path
@@ -418,7 +431,6 @@ components:
         email:
           type: string
           format: email
-        # Password update usually requires a separate endpoint or logic
 
     UserResponse:
       type: object
@@ -447,7 +459,6 @@ components:
           type: string
         description:
           type: string
-        # OwnerID is inferred from the JWT of the logged-in user
 
     ProjectResponse:
       type: object
