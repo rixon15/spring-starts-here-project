@@ -24,7 +24,7 @@ public class ProjectController implements ProjectsApi {
 
     //Get list of projects
     @Override
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<List<ProjectResponse>> getAllProjects() {
         return new ResponseEntity<>(projectService.getAllProjects(), HttpStatus.OK);
 
