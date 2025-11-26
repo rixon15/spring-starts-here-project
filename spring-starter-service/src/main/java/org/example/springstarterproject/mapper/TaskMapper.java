@@ -7,13 +7,15 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.openapitools.jackson.nullable.JsonNullable;
 
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+
 @Mapper(componentModel = "spring")
 public interface TaskMapper {
 
     @Mapping(source = "project.id", target = "projectId")
     @Mapping(source = "user.id", target = "assigneeId")
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
     TaskResponse toDto(Task task);
 
     @Mapping(target = "id", ignore = true)
@@ -24,6 +26,14 @@ public interface TaskMapper {
 
     default JsonNullable<Long> map(Long value) {
         return value != null ? JsonNullable.of(value) : JsonNullable.undefined();
+    }
+
+    default OffsetDateTime map(Instant instant) {
+        if (instant == null) {
+            return null;
+        }
+        // Converts the Instant to UTC OffsetDateTime
+        return instant.atOffset(ZoneOffset.UTC);
     }
 
 }

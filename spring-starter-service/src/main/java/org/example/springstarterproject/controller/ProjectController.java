@@ -25,14 +25,14 @@ public class ProjectController implements ProjectsApi {
     //Get list of projects
     @Override
     @GetMapping("/")
-    public ResponseEntity<List<ProjectResponse>> projectsGet() {
+    public ResponseEntity<List<ProjectResponse>> getAllProjects() {
         return new ResponseEntity<>(projectService.getAllProjects(), HttpStatus.OK);
 
     }
 
     @DeleteMapping("/{id}")
     @Override
-    public ResponseEntity<Void> projectsIdDelete(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -40,25 +40,25 @@ public class ProjectController implements ProjectsApi {
 
     @GetMapping("/{id}")
     @Override
-    public ResponseEntity<ProjectResponse> projectsIdGet(@PathVariable Long id) {
+    public ResponseEntity<ProjectResponse> getProjectById(@PathVariable Long id) {
         return new ResponseEntity<>(projectService.getProjectById(id), HttpStatus.OK);
     }
 
     @PostMapping("/")
     @Override
-    public ResponseEntity<ProjectResponse> projectsPost(@RequestBody ProjectRequest projectRequest) {
+    public ResponseEntity<ProjectResponse> createProject(@RequestBody ProjectRequest projectRequest) {
         return new ResponseEntity<>(projectService.createProject(projectRequest), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}/tasks")
     @Override
-    public ResponseEntity<List<TaskResponse>> projectsProjectIdTasksGet(@PathVariable Long id) {
+    public ResponseEntity<List<TaskResponse>> getTasksByProjectId(@PathVariable Long id) {
         return new ResponseEntity<>(projectService.getAllTasks(id), HttpStatus.OK);
     }
 
     @PostMapping("/{id}/tasks")
     @Override
-    public ResponseEntity<TaskResponse> projectsProjectIdTasksPost(@PathVariable Long id, TaskRequest taskRequest) {
+    public ResponseEntity<TaskResponse> createTask(@PathVariable Long id, TaskRequest taskRequest) {
         return new ResponseEntity<>(projectService.createTaskInProject(id, taskRequest), HttpStatus.CREATED);
     }
 }
