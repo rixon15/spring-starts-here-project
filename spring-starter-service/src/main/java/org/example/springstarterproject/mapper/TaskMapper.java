@@ -5,6 +5,7 @@ import com.example.models.TaskResponse;
 import org.example.springstarterproject.model.Task;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.openapitools.jackson.nullable.JsonNullable;
 
 import java.time.Instant;
@@ -23,6 +24,8 @@ public interface TaskMapper {
     @Mapping(target = "user", ignore = true) // handled inside service
     @Mapping(target = "status", source = "status")
     Task fromDto(TaskRequest request);
+
+    void updateTaskFromDto(TaskRequest dto, @MappingTarget Task entity);
 
     default JsonNullable<Long> map(Long value) {
         return value != null ? JsonNullable.of(value) : JsonNullable.undefined();
