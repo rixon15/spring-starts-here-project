@@ -31,6 +31,8 @@ public class Task {
     @NotNull
     private String title;
     @NotNull
+    private String description;
+    @NotNull
     @Enumerated(EnumType.STRING)
     private TaskStatus status = TaskStatus.TODO;
     @NotNull

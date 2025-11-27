@@ -5,6 +5,7 @@ import com.example.models.ProjectRequest;
 import com.example.models.ProjectResponse;
 import com.example.models.TaskRequest;
 import com.example.models.TaskResponse;
+import jakarta.validation.Valid;
 import org.example.springstarterproject.service.implementation.ProjectServiceImp;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +47,7 @@ public class ProjectController implements ProjectsApi {
 
     @PostMapping("/")
     @Override
-    public ResponseEntity<ProjectResponse> createProject(@RequestBody ProjectRequest projectRequest) {
+    public ResponseEntity<ProjectResponse> createProject(@Valid ProjectRequest projectRequest) {
         return new ResponseEntity<>(projectService.createProject(projectRequest), HttpStatus.CREATED);
     }
 
@@ -58,7 +59,7 @@ public class ProjectController implements ProjectsApi {
 
     @PostMapping("/{id}/tasks")
     @Override
-    public ResponseEntity<TaskResponse> createTask(@PathVariable Long id, TaskRequest taskRequest) {
+    public ResponseEntity<TaskResponse> createTask(@PathVariable Long id,@Valid TaskRequest taskRequest) {
         return new ResponseEntity<>(projectService.createTaskInProject(id, taskRequest), HttpStatus.CREATED);
     }
 }

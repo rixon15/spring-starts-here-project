@@ -22,6 +22,7 @@ CREATE TABLE tasks
     project_id  BIGINT       NOT NULL,
     assignee_id BIGINT,
     title       VARCHAR(255) NOT NULL,
+    description VARCHAR(255) NOT NULL,
     status      VARCHAR(255) NOT NULL,
     due_date    TIMESTAMP WITHOUT TIME ZONE             NOT NULL,
     created_at  TIMESTAMP WITHOUT TIME ZONE             NOT NULL,

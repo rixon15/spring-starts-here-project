@@ -23,7 +23,6 @@ public class GlobalExceptionHandler{
                 .collect(Collectors.joining(", "));
 
         Error errorResponse = new Error();
-        errorResponse.setMessage(errorMessage);
         errorResponse.setCode(HttpStatus.BAD_REQUEST.value());
         errorResponse.setMessage("Validation Failed: " + errorMessage);
 
