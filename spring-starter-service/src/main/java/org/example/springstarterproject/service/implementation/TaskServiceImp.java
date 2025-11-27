@@ -59,6 +59,10 @@ public class TaskServiceImp implements TaskService {
             throw new IllegalArgumentException("Task title cannot be whitespace");
         }
 
+        if (taskRequest.getDescription() != null && taskRequest.getDescription().isBlank()) {
+            throw new IllegalArgumentException("Task title cannot be whitespace");
+        }
+
         if (taskRequest.getDueDate() != null
                 && taskRequest.getDueDate().isBefore(LocalDate.now())) {
             throw new IllegalArgumentException("Due date cannot be in the past");
