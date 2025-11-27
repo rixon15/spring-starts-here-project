@@ -73,8 +73,11 @@ public class ProjectServiceImp implements ProjectService {
 
     @Override
     public List<TaskResponse> getAllTasks(Long id) {
-        List<Task> tasks = taskRepository.findTaskByProject_Id(id)
+
+        projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(id));
+
+        List<Task> tasks = taskRepository.findTaskByProject_Id(id);
 
         return tasks.stream().map(taskMapper::toDto).collect(Collectors.toList());
     }
