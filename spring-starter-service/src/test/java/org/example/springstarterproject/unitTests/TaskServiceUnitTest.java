@@ -1,4 +1,4 @@
-package org.example.springstarterproject;
+package org.example.springstarterproject.unitTests;
 
 import com.example.models.TaskRequest;
 import com.example.models.TaskResponse;

@@ -176,7 +176,7 @@
 
                             <apiPackage>com.example.client.api</apiPackage>
 
-                            <modelPackage>com.example.models</modelPackage>
+                            <modelPackage>com.example.client.models</modelPackage>
                             <configOptions>
                                 <useJakartaEe>true</useJakartaEe>
                                 <openApiNullable>false</openApiNullable>
