@@ -45,7 +45,7 @@ public class ProjectController implements ProjectsApi {
         return new ResponseEntity<>(projectService.getProjectById(id), HttpStatus.OK);
     }
 
-    @PostMapping("/")
+    @PostMapping()
     @Override
     public ResponseEntity<ProjectResponse> createProject(@Valid ProjectRequest projectRequest) {
         return new ResponseEntity<>(projectService.createProject(projectRequest), HttpStatus.CREATED);
