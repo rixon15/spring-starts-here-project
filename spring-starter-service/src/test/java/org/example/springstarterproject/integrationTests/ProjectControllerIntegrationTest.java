@@ -32,13 +32,13 @@ public class ProjectControllerIntegrationTest extends BaseIntegrationTest {
 
         ProjectResponse created = projectsApi.createProject(projectRequest);
 
-        assertThat(created.getId()).isNotNull();
-        assertThat(created.getName()).isEqualTo("Integration test project");
+        assertNotNull(created.getId());
+        assertEquals("Integration test project", created.getName());
+        assertEquals(1L, created.getOwnerId());
         //This has to be checked against the currently logged-in user, currently 1L hardcoded
-        assertThat(created.getOwnerId()).isEqualTo(1L);
 
         ProjectResponse fetched = projectsApi.getProjectById(created.getId());
-        assertThat(fetched.getName()).isEqualTo("Integration test project");
+        assertEquals("Integration test project", fetched.getName());
 
     }
 

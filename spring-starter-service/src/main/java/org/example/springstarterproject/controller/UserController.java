@@ -30,7 +30,7 @@ public class UserController implements UsersApi {
     @GetMapping("/{id}")
     @Override
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
-        return new ResponseEntity<>(userService.getUserById(id), HttpStatus.FOUND);
+        return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
