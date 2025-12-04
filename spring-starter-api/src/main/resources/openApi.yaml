@@ -514,6 +514,8 @@ components:
           format: int64
         title:
           type: string
+        description:
+          type: string
         status:
           $ref: '#/components/schemas/TaskStatus'
         assigneeId:
