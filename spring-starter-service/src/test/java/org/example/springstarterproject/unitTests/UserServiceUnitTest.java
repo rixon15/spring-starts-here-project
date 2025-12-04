@@ -1,4 +1,4 @@
-package org.example.springstarterproject;
+package org.example.springstarterproject.unitTests;
 
 import com.example.models.UserResponse;
 import com.example.models.UserUpdateRequest;

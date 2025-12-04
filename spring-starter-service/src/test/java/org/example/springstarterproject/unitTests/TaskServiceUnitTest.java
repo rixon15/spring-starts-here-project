@@ -1,4 +1,4 @@
-package org.example.springstarterproject;
+package org.example.springstarterproject.unitTests;
 
 import com.example.models.TaskRequest;
 import com.example.models.TaskResponse;
@@ -152,11 +152,11 @@ public class TaskServiceUnitTest {
     }
 
     @Nested
-    @DisplayName("Update task asignee logic")
+    @DisplayName("Update task assignee logic")
     class AssigneeLogic {
 
         @Test
-        @DisplayName("Should throw EntityNotFoundException if new Asignee id does not exist")
+        @DisplayName("Should throw EntityNotFoundException if new Assignee id does not exist")
         void assigneeNotFound() {
 
             Task task = new Task();
@@ -171,7 +171,7 @@ public class TaskServiceUnitTest {
         }
 
         @Test
-        @DisplayName("Should nor check user existence if asignee is et to null")
+        @DisplayName("Should nor check user existence if assignee is et to null")
         void noAssignedUser() {
             Task task = new Task();
             TaskRequest taskRequest = new TaskRequest();
