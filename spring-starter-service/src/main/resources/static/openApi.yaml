@@ -1,0 +1,533 @@
+openapi: 3.0.3
+info:
+  title: Project Management API
+  description: API for User, Project, and Task management with JWT and OAuth support.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local Development Server
+
+# 1. GLOBAL SECURITY
+security:
+  - bearerAuth: []
+
+paths:
+  # ----------------------------
+  # AUTHENTICATION (PUBLIC)
+  # ----------------------------
+  /auth/register:
+    post:
+      summary: Register a new user
+      description: Creates a new user account and returns a JWT token. Public endpoint.
+      operationId: registerUser # <--- METHOD NAME: registerUser(...)
+      tags: [Authentication]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /auth/login:
+    post:
+      summary: Login with credentials
+      description: Exchange email and password for a JWT token. Public endpoint.
+      operationId: loginUser # <--- METHOD NAME: loginUser(...)
+      tags: [Authentication]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/login/oauth:
+    post:
+      summary: Login via OAuth Provider
+      description: |
+        Exchange an OAuth provider's ID token (e.g., from Google/GitHub) for an internal system JWT.
+      operationId: loginViaOAuth # <--- METHOD NAME: loginViaOAuth(...)
+      tags: [Authentication]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OAuthLoginRequest'
+      responses:
+        '200':
+          description: OAuth Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ----------------------------
+  # USERS (PROTECTED)
+  # ----------------------------
+  /users:
+    get:
+      summary: List all users
+      operationId: getAllUsers # <--- METHOD NAME: getAllUsers(...)
+      tags: [Users]
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+
+  /users/{id}:
+    get:
+      summary: Get user by ID
+      operationId: getUserById # <--- METHOD NAME: getUserById(Long id)
+      tags: [Users]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+    put:
+      summary: Update user profile
+      operationId: updateUser # <--- METHOD NAME: updateUser(Long id, UserUpdateRequest request)
+      tags: [Users]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+  # ----------------------------
+  # PROJECTS (PROTECTED)
+  # ----------------------------
+  /projects:
+    get:
+      summary: List projects
+      operationId: getAllProjects # <--- METHOD NAME: getAllProjects(...)
+      tags: [Projects]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectResponse'
+    post:
+      summary: Create a project
+      operationId: createProject # <--- METHOD NAME: createProject(ProjectRequest request)
+      tags: [Projects]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectRequest'
+      responses:
+        '201':
+          description: Project created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectResponse'
+
+  /projects/{id}:
+    get:
+      summary: Get project details
+      operationId: getProjectById # <--- METHOD NAME: getProjectById(Long id)
+      tags: [Projects]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectResponse'
+    delete:
+      summary: Delete project
+      operationId: deleteProject # <--- METHOD NAME: deleteProject(Long id)
+      tags: [Projects]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        '204':
+          description: Project deleted
+
+  # ----------------------------
+  # TASKS (PROTECTED)
+  # ----------------------------
+  /projects/{projectId}/tasks:
+    get:
+      summary: List tasks for a specific project
+      operationId: getTasksByProjectId # <--- METHOD NAME: getTasksByProjectId(Long projectId)
+      tags: [Tasks]
+      parameters:
+        - in: path
+          name: projectId
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskResponse'
+    post:
+      summary: Create a task in a project
+      operationId: createTask # <--- METHOD NAME: createTask(Long projectId, TaskRequest request)
+      tags: [Tasks]
+      parameters:
+        - in: path
+          name: projectId
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskRequest'
+      responses:
+        '201':
+          description: Task created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+
+  /tasks/{id}:
+    get:
+      summary: Get task details
+      operationId: getTaskById # <--- METHOD NAME: getTaskById(Long id)
+      tags: [Tasks]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+    put:
+      summary: Update task details
+      operationId: updateTask # <--- METHOD NAME: updateTask(Long id, TaskRequest request)
+      tags: [Tasks]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskRequest'
+      responses:
+        '200':
+          description: Task updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+    delete:
+      summary: Delete task
+      operationId: deleteTask # <--- METHOD NAME: deleteTask(Long id)
+      tags: [Tasks]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        '204':
+          description: Task deleted
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    BadRequest:
+      description: Invalid input data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Authentication failed or token missing/invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    # --- Common / Utils ---
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+
+    # --- Authentication ---
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    OAuthLoginRequest:
+      type: object
+      required: [provider, token]
+      properties:
+        provider:
+          type: string
+          enum: [google, github]
+          description: The OAuth provider being used.
+        token:
+          type: string
+          description: The ID token or Access token received from the provider (Frontend to Backend exchange).
+
+    RegisterRequest:
+      type: object
+      required: [username, email, password]
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    AuthResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: JWT Access Token
+        tokenType:
+          type: string
+          example: "Bearer"
+        expiresIn:
+          type: integer
+          description: Expiration time in seconds
+        user:
+          $ref: '#/components/schemas/UserResponse'
+
+    # --- Roles ---
+    Role:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+
+    # --- Users ---
+    UserUpdateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        email:
+          type: string
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+        createdAt:
+          type: string
+          format: date-time
+
+    # --- Projects ---
+    ProjectRequest:
+      type: object
+      required: [name, description]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+
+    ProjectResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        ownerId:
+          type: integer
+          format: int64
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    # --- Tasks ---
+    TaskStatus:
+      type: string
+      enum: [TODO, IN_PROGRESS, DONE, ARCHIVED]
+
+    TaskRequest:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        assigneeId:
+          type: integer
+          format: int64
+          nullable: true
+        dueDate:
+          type: string
+          format: date
+
+    TaskResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        projectId:
+          type: integer
+          format: int64
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        assigneeId:
+          type: integer
+          format: int64
+          nullable: true
+        dueDate:
+          type: string
+          format: date
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time

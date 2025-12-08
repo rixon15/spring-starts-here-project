@@ -10,6 +10,9 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
-        configurer.addPathPrefix("/api/v1", clazz -> clazz.isAnnotationPresent(RestController.class));
+        configurer.addPathPrefix("/api/v1", clazz ->
+                clazz.isAnnotationPresent(RestController.class)
+//                        && clazz.getPackageName().startsWith("org.example.springstarterproject")
+        );
     }
 }
