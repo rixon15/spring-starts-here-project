@@ -109,7 +109,23 @@ paths:
                 $ref: '#/components/schemas/AuthResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
-
+  /auth/logout:
+    post:
+      summary: Logout user
+      description: Logs out the current user by clearing the refresh token cookie.
+      operationId: logoutUser
+      tags: [ Authentication ]
+      responses:
+        '204':
+          description: Logout successful, cookie cleared.
+          headers:
+            Set-Cookie:
+              description: Clears the refresh_token cookie by setting its expiration to zero.
+              schema:
+                type: string
+                example: refresh_token=; Path=/api/v1/auth/refresh; Max-Age=0; HttpOnly; Secure; SameSite=Strict
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   # ----------------------------
   # USERS (PROTECTED)
   # ----------------------------

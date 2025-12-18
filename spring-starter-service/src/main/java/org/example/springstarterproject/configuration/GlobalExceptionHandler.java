@@ -9,6 +9,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -85,6 +86,15 @@ public class GlobalExceptionHandler {
         Error errorResponse = new Error();
         errorResponse.setCode(HttpStatus.UNAUTHORIZED.value());
         errorResponse.setMessage("Authentication failed: " + ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(MissingRequestCookieException.class)
+    public ResponseEntity<Error> handleMissingRequestCookieException() {
+        Error errorResponse = new Error();
+        errorResponse.setCode(HttpStatus.UNAUTHORIZED.value());
+        errorResponse.setMessage("Session expired or invalid. Please login again");
+
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 }

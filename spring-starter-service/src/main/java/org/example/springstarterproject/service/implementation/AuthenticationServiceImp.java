@@ -133,4 +133,15 @@ public class AuthenticationServiceImp implements AuthenticationService {
                 .sameSite("Strict")
                 .build();
     }
+
+    @Override
+    public ResponseCookie deleteCookie() {
+        return ResponseCookie.from("refresh_token", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/api/v1/auth/refresh")
+                .maxAge(0)
+                .sameSite("Strict")
+                .build();
+    }
 }

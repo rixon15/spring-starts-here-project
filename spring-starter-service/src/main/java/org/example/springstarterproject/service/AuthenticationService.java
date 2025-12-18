@@ -12,4 +12,6 @@ public interface AuthenticationService {
     AuthResponse refreshToken(String refreshToken);
 
     ResponseCookie createRefreshTokenCookie(String refreshToken);
+
+    ResponseCookie deleteCookie();
 }

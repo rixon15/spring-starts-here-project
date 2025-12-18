@@ -43,10 +43,23 @@ public class AuthController implements AuthApi {
     }
 
 
-
     @Override
     public ResponseEntity<AuthResponse> loginViaOAuth(OAuthLoginRequest oauthLoginRequest) {
         return null;
+    }
+
+    @PostMapping("/logout")
+    @Override
+    public ResponseEntity<Void> logoutUser() {
+
+        HttpServletResponse response = request.getNativeResponse(HttpServletResponse.class);
+
+        if (response != null) {
+            response.addHeader(HttpHeaders.SET_COOKIE, authenticationService.deleteCookie().toString());
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+
     }
 
     @PostMapping("/refresh")
