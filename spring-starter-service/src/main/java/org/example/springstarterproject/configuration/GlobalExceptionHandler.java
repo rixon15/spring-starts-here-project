@@ -1,10 +1,13 @@
 package org.example.springstarterproject.configuration;
 
 import com.example.models.Error;
+import org.apache.tomcat.websocket.AuthenticationException;
 import org.example.springstarterproject.exception.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -31,7 +34,7 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Error> handleJsonErrors(HttpMessageNotReadableException ex) {
+    public ResponseEntity<Error> handleJsonErrors() {
 
         Error errorResponse = new Error();
         errorResponse.setCode(HttpStatus.BAD_REQUEST.value());
@@ -52,7 +55,7 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Error> handleGeneralExceptions(Exception ex) {
+    public ResponseEntity<Error> handleGeneralExceptions() {
 
         Error errorResponse = new Error();
         errorResponse.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -61,4 +64,27 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Error> handleBadCredentialsException() {
+        Error errorResponse = new Error();
+        errorResponse.setCode(HttpStatus.UNAUTHORIZED.value());
+        errorResponse.setMessage("Invalid email or password");
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<Error> handleDisabledException() {
+        Error errorResponse = new Error();
+        errorResponse.setCode(HttpStatus.FORBIDDEN.value());
+        errorResponse.setMessage("Your account has been disabled");
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Error> handleAuthenticationException(AuthenticationException ex) {
+        Error errorResponse = new Error();
+        errorResponse.setCode(HttpStatus.UNAUTHORIZED.value());
+        errorResponse.setMessage("Authentication failed: " + ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
 }

@@ -11,7 +11,7 @@ INSERT INTO users (id, username, email, password, created_at, updated_at)
 VALUES (1,
         'demo_user',
         'demo@example.com',
-        '$2a$10$eAccJf9WUj/MCD.K8s5VIube.ogjG1.wMpt2.3eLg7TqQ7.6rT3rO',
+        '{noop}demo',
         CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP);
 
