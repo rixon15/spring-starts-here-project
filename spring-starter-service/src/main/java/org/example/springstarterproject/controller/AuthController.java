@@ -34,8 +34,11 @@ public class AuthController implements AuthApi {
         return null;
     }
 
+    @PostMapping("/register")
     @Override
     public ResponseEntity<AuthResponse> registerUser(RegisterRequest registerRequest) {
-        return null;
+        return new ResponseEntity<>(authenticationService.register(
+                registerRequest.getEmail(), registerRequest.getUsername(),
+                registerRequest.getPassword()), HttpStatus.CREATED);
     }
 }
