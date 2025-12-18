@@ -12,10 +12,15 @@ import org.example.springstarterproject.repository.RoleRepository;
 import org.example.springstarterproject.repository.UserRepository;
 import org.example.springstarterproject.service.AuthenticationService;
 import org.example.springstarterproject.service.TokenService;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -29,14 +34,18 @@ public class AuthenticationServiceImp implements AuthenticationService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final JwtDecoder jwtDecoder;
+    private final UserDetailsService userDetailsService;
 
-    public AuthenticationServiceImp(AuthenticationManager authenticationManager, TokenService tokenService, UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
+    public AuthenticationServiceImp(AuthenticationManager authenticationManager, TokenService tokenService, UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder, RoleRepository roleRepository, JwtDecoder jwtDecoder, UserDetailsService userDetailsService) {
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
+        this.jwtDecoder = jwtDecoder;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -45,15 +54,17 @@ public class AuthenticationServiceImp implements AuthenticationService {
                 new UsernamePasswordAuthenticationToken(email, password)
         );
 
-        String token = tokenService.generateToken(authentication);
+        String accessToken = tokenService.generateAccessToken(authentication);
+        String refreshToken = tokenService.generateRefreshToken(authentication);
 
         User userEntity = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("User not found after authentication"));
 
         AuthResponse authResponse = new AuthResponse();
-        authResponse.setAccessToken(token);
+        authResponse.setAccessToken(accessToken);
+        authResponse.setRefreshToken(refreshToken);
         authResponse.setTokenType("Bearer");
-        authResponse.setExpiresIn(600);
+        authResponse.setExpiresIn(900);
         authResponse.setUser(userMapper.toDto(userEntity));
 
         return authResponse;
@@ -86,5 +97,40 @@ public class AuthenticationServiceImp implements AuthenticationService {
         authResponse.setUser(userMapper.toDto(userRepository.save(user)));
 
         return authResponse;
+    }
+
+    @Override
+    public AuthResponse refreshToken(String refreshToken) {
+        Jwt jwt = jwtDecoder.decode(refreshToken);
+
+        String email = jwt.getSubject();
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User not found after authentication"));
+
+        String newAccessToken = tokenService.generateAccessToken(authentication);
+
+        AuthResponse authResponse = new AuthResponse();
+        authResponse.setAccessToken(newAccessToken);
+        authResponse.setAccessToken(newAccessToken);
+        authResponse.setRefreshToken(tokenService.generateRefreshToken(authentication));
+        authResponse.setTokenType("Bearer");
+        authResponse.setUser(userMapper.toDto(user));
+        authResponse.setExpiresIn(900);
+
+        return authResponse;
+    }
+
+    @Override
+    public ResponseCookie createRefreshTokenCookie(String refreshToken) {
+        return ResponseCookie.from("refresh_token", refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/api/v1/auth/refresh")
+                .maxAge(5 * 24 * 60 * 60)
+                .sameSite("Strict")
+                .build();
     }
 }

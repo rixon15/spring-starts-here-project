@@ -41,10 +41,9 @@ paths:
   /auth/login:
     post:
       summary: Login with credentials
-      description: Exchange email and password for a JWT token. Public endpoint.
-      operationId: loginUser # <--- METHOD NAME: loginUser(...)
-      tags: [Authentication]
-      security: []
+      operationId: loginUser
+      tags: [ Authentication ]
+      security: [ ]
       requestBody:
         required: true
         content:
@@ -54,13 +53,39 @@ paths:
       responses:
         '200':
           description: Login successful
+          headers:
+            Set-Cookie: # <--- This represents the HttpServletResponse action
+              description: Contains the refresh token in a secure, HttpOnly cookie.
+              schema:
+                type: string
+                example: refresh_token=eyJhbGci...; Path=/api/v1/auth/refresh; HttpOnly; Secure; SameSite=Strict
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
-
+  /auth/refresh:
+    post:
+      summary: Refresh access token
+      operationId: refreshToken
+      tags: [ Authentication ]
+      parameters:
+        - name: refresh_token
+          in: cookie
+          required: true
+          schema:
+            type: string
+          description: The secure refresh token cookie
+      responses:
+        '200':
+          description: New access token generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /auth/login/oauth:
     post:
       summary: Login via OAuth Provider
