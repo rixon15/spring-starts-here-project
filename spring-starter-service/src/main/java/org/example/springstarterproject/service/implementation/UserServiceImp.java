@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,7 +42,7 @@ public class UserServiceImp implements UserService {
     @Transactional
     public UserResponse updateUser(Long id, UserUpdateRequest userUpdateRequest) {
 
-        User user =  userRepository.findById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(id));
 
         if (userUpdateRequest.getEmail() != null
@@ -57,8 +58,26 @@ public class UserServiceImp implements UserService {
             throw new IllegalArgumentException("Username cannot be whitespace");
         }
 
-        userMapper.updateUserFromDto(userUpdateRequest,user);
+        userMapper.updateUserFromDto(userUpdateRequest, user);
 
         return userMapper.toDto(userRepository.save(user));
+    }
+
+    @Override
+    public User processOAuthLogin(String email) {
+
+        Optional<User> existingUser = userRepository.findByEmail(email);
+
+        if (existingUser.isPresent()) {
+            return existingUser.get();
+        }
+
+        User newUser = new User();
+        newUser.setEmail(email);
+        newUser.setUsername("{noop}HasToBePromptedOnFirstLoginToSetUsername");
+        newUser.setPassword("{noop}HasToBePromptedOnFirstLoginToSetPassword");
+
+        userRepository.save(newUser);
+        return newUser;
     }
 }

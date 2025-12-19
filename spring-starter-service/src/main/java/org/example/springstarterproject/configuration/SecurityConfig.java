@@ -1,52 +1,49 @@
 package org.example.springstarterproject.configuration;
 
-import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
-import com.nimbusds.jose.jwk.source.JWKSource;
-import com.nimbusds.jose.proc.SecurityContext;
+import org.example.springstarterproject.model.User;
+import org.example.springstarterproject.service.AuthenticationService;
+import org.example.springstarterproject.service.TokenService;
+import org.example.springstarterproject.service.UserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
 @EnableConfigurationProperties(RsaKeyProperties.class)
 public class SecurityConfig {
 
-    private final RsaKeyProperties rsaKeyProperties;
+    private final UserService userService;
+    private final TokenService tokenService;
+    private final AuthenticationService authenticationService;
+    private final String redirectURL;
 
-    public SecurityConfig(RsaKeyProperties rsaKeyProperties) {
-        this.rsaKeyProperties = rsaKeyProperties;
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
-        var authProvider = new DaoAuthenticationProvider(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder);
-
-        return new ProviderManager(authProvider);
+    public SecurityConfig(UserService userService, TokenService tokenService,
+                          AuthenticationService authenticationService,
+                          @Value("${app.oauth2.redirect-url:http://localhost:8080}") String redirectURL) {
+        this.userService = userService;
+        this.tokenService = tokenService;
+        this.authenticationService = authenticationService;
+        this.redirectURL = redirectURL;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        http.oauth2Login(
+                oauth2 -> oauth2.successHandler(oAuth2AuthenticationSuccessHandler())
+        );
+
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").anonymous()
@@ -58,20 +55,21 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtEncoder jwtEncoder() {
-        JWK jwk = new RSAKey.Builder(rsaKeyProperties.publicKey()).privateKey(rsaKeyProperties.privateKey()).build();
-        JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
-        return new NimbusJwtEncoder(jwks);
-    }
+    public AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
+        return ((request, response, authentication) -> {
+            OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+            String email = oAuth2User.getAttribute("email");
 
-    @Bean
-    public JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withPublicKey(rsaKeyProperties.publicKey()).build();
-    }
+            User user = userService.processOAuthLogin(email);
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+            String accessToken = tokenService.generateAccessToken(authentication);
+            String refreshToken = tokenService.generateRefreshToken(authentication);
+
+            response.addHeader(HttpHeaders.SET_COOKIE, authenticationService.createRefreshTokenCookie(refreshToken).toString());
+
+            //Here we should redirect the user to the success url of the frontend
+            response.sendRedirect(redirectURL + "/login-success?token=" + accessToken);
+        });
     }
 
 }

@@ -16,6 +16,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController implements AuthApi {
@@ -49,9 +50,12 @@ public class AuthController implements AuthApi {
         return new ResponseEntity<>(authResponse, HttpStatus.OK);
     }
 
-
+    @GetMapping("/login/oauth2")
     @Override
     public ResponseEntity<AuthResponse> loginViaOAuth(OAuthLoginRequest oauthLoginRequest) {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        HttpServletResponse response = attributes.getResponse();
+
         return null;
     }
 
