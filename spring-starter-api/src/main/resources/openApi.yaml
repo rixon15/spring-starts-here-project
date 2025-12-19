@@ -86,29 +86,30 @@ paths:
                 $ref: '#/components/schemas/AuthResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
-  /auth/login/oauth:
-    post:
-      summary: Login via OAuth Provider
-      description: |
-        Exchange an OAuth provider's ID token (e.g., from Google/GitHub) for an internal system JWT.
-      operationId: loginViaOAuth # <--- METHOD NAME: loginViaOAuth(...)
-      tags: [Authentication]
-      security: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OAuthLoginRequest'
-      responses:
-        '200':
-          description: OAuth Login successful
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+#  /auth/login/oauth:
+#    post:
+#      summary: Login via OAuth Provider
+#      description: |
+#        Exchange an OAuth provider's ID token (e.g., from Google/GitHub) for an internal system JWT.
+#      operationId: loginViaOAuth # <--- METHOD NAME: loginViaOAuth(...)
+#      tags: [Authentication]
+#      x-internal: true
+#      security: []
+#      requestBody:
+#        required: true
+#        content:
+#          application/json:
+#            schema:
+#              $ref: '#/components/schemas/OAuthLoginRequest'
+#      responses:
+#        '200':
+#          description: OAuth Login successful
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/AuthResponse'
+#        '401':
+#          $ref: '#/components/responses/Unauthorized'
   /auth/logout:
     post:
       summary: Logout user

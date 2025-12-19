@@ -50,15 +50,6 @@ public class AuthController implements AuthApi {
         return new ResponseEntity<>(authResponse, HttpStatus.OK);
     }
 
-    @GetMapping("/login/oauth2")
-    @Override
-    public ResponseEntity<AuthResponse> loginViaOAuth(OAuthLoginRequest oauthLoginRequest) {
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-        HttpServletResponse response = attributes.getResponse();
-
-        return null;
-    }
-
     @PostMapping("/logout")
     @Override
     public ResponseEntity<Void> logoutUser() {

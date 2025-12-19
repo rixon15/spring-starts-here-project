@@ -46,7 +46,14 @@ public class SecurityConfig {
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**").anonymous()
+                        .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login").anonymous()
+                        .requestMatchers("/openApi.yaml",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/api/v1/v3/api-docs/**",
+                                "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/v1/openApi.yaml/swagger-config",
+                                "/api/v1/openApi.yaml").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth.jwt(Customizer.withDefaults()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
