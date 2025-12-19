@@ -1,6 +1,8 @@
 package org.example.springstarterproject.service.implementation;
 
 import com.example.models.AuthResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.example.springstarterproject.exception.EntityNotFoundException;
 import org.example.springstarterproject.mapper.UserMapper;
@@ -11,6 +13,7 @@ import org.example.springstarterproject.model.UserRoleKey;
 import org.example.springstarterproject.repository.RoleRepository;
 import org.example.springstarterproject.repository.UserRepository;
 import org.example.springstarterproject.service.AuthenticationService;
+import org.example.springstarterproject.service.TokenBlacklistService;
 import org.example.springstarterproject.service.TokenService;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +26,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Set;
 
 @Service
@@ -36,8 +40,9 @@ public class AuthenticationServiceImp implements AuthenticationService {
     private final RoleRepository roleRepository;
     private final JwtDecoder jwtDecoder;
     private final UserDetailsService userDetailsService;
+    private final TokenBlacklistService tokenBlacklistService;
 
-    public AuthenticationServiceImp(AuthenticationManager authenticationManager, TokenService tokenService, UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder, RoleRepository roleRepository, JwtDecoder jwtDecoder, UserDetailsService userDetailsService) {
+    public AuthenticationServiceImp(AuthenticationManager authenticationManager, TokenService tokenService, UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder, RoleRepository roleRepository, JwtDecoder jwtDecoder, UserDetailsService userDetailsService, TokenBlacklistService tokenBlacklistService) {
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
         this.userRepository = userRepository;
@@ -46,6 +51,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
         this.roleRepository = roleRepository;
         this.jwtDecoder = jwtDecoder;
         this.userDetailsService = userDetailsService;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     @Override
@@ -128,20 +134,41 @@ public class AuthenticationServiceImp implements AuthenticationService {
         return ResponseCookie.from("refresh_token", refreshToken)
                 .httpOnly(true)
                 .secure(true)
-                .path("/api/v1/auth/refresh")
+                .path("/api/v1/auth/")
                 .maxAge(5 * 24 * 60 * 60)
                 .sameSite("Strict")
                 .build();
     }
 
     @Override
-    public ResponseCookie deleteCookie() {
+    public ResponseCookie deleteCookie(HttpServletRequest request) {
+
+        String refreshToken = extractTokenFromCookie(request);
+
+        if(refreshToken != null) {
+            tokenBlacklistService.blacklistToken(refreshToken);
+        }
+
         return ResponseCookie.from("refresh_token", "")
                 .httpOnly(true)
                 .secure(true)
-                .path("/api/v1/auth/refresh")
+                .path("/api/v1/auth/")
                 .maxAge(0)
                 .sameSite("Strict")
                 .build();
     }
+
+    private String extractTokenFromCookie(HttpServletRequest request) {
+        if(request.getCookies() == null) {
+            return null;
+        }
+
+        return Arrays.stream(request.getCookies())
+                .filter(cookie -> "refresh_token".equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .findFirst()
+                .orElse(null);
+    }
+
+
 }

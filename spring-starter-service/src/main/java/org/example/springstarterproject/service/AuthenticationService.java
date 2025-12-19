@@ -1,6 +1,7 @@
 package org.example.springstarterproject.service;
 
 import com.example.models.AuthResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseCookie;
 
 public interface AuthenticationService {
@@ -13,5 +14,5 @@ public interface AuthenticationService {
 
     ResponseCookie createRefreshTokenCookie(String refreshToken);
 
-    ResponseCookie deleteCookie();
+    ResponseCookie deleteCookie(HttpServletRequest request);
 }
