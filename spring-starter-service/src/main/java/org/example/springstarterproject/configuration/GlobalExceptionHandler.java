@@ -13,6 +13,7 @@ import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.nio.file.AccessDeniedException;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -97,4 +98,14 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
+
+    @ExceptionHandler({AccessDeniedException.class, org.springframework.security.authorization.AuthorizationDeniedException.class})
+    public ResponseEntity<Error> handleAccessDeniedException(Exception ex) {
+        Error errorResponse = new Error();
+        errorResponse.setCode(HttpStatus.FORBIDDEN.value());
+        errorResponse.setMessage("Access Denied: You don't have permission to perform this action");
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
 }

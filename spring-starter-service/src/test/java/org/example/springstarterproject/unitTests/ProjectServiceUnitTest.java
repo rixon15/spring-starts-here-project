@@ -9,8 +9,10 @@ import org.example.springstarterproject.mapper.ProjectMapper;
 import org.example.springstarterproject.mapper.TaskMapper;
 import org.example.springstarterproject.model.Project;
 import org.example.springstarterproject.model.Task;
+import org.example.springstarterproject.model.User;
 import org.example.springstarterproject.repository.ProjectRepository;
 import org.example.springstarterproject.repository.TaskRepository;
+import org.example.springstarterproject.repository.UserRepository;
 import org.example.springstarterproject.service.implementation.ProjectServiceImp;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +43,8 @@ public class ProjectServiceUnitTest {
     TaskRepository taskRepository;
     @Mock
     TaskMapper taskMapper;
+    @Mock
+    UserRepository userRepository;
 
     @InjectMocks
     private ProjectServiceImp projectService;
@@ -136,6 +143,9 @@ public class ProjectServiceUnitTest {
     @DisplayName("createProject: Should return newly created project")
     public void createProject_HappyFlow() {
 
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+
         String name = "Project";
 
         ProjectRequest projectRequest = new ProjectRequest();
@@ -145,10 +155,20 @@ public class ProjectServiceUnitTest {
         Project project = new Project();
         project.setName(name);
 
+        User mockUser = new User();
+        mockUser.setId(1L);
+        mockUser.setEmail("demo@example.com");
+
         when(projectMapper.fromDto(projectRequest)).thenReturn(project);
         when(projectRepository.save(project)).thenReturn(project);
         when(projectMapper.toDto(project)).thenReturn(projectResponse);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("demo@example.com");
+        when(userRepository.findByEmail("demo@example.com")).thenReturn(Optional.of(mockUser));
 
+
+
+        SecurityContextHolder.setContext(securityContext);
         ProjectResponse result = projectService.createProject(projectRequest);
 
         assertNotNull(result);
@@ -170,12 +190,23 @@ public class ProjectServiceUnitTest {
         ProjectRequest projectRequest = new ProjectRequest();
         projectRequest.setName(name);
 
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+
         Project project = new Project();
         project.setName(name);
 
+        User mockUser = new User();
+        mockUser.setId(1L);
+        mockUser.setEmail("demo@example.com");
+
         when(projectMapper.fromDto(projectRequest)).thenReturn(project);
         when(projectRepository.save(project)).thenThrow(new DataIntegrityViolationException("Name already exists"));
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("demo@example.com");
+        when(userRepository.findByEmail("demo@example.com")).thenReturn(Optional.of(mockUser));
 
+        SecurityContextHolder.setContext(securityContext);
 
         assertThrows(org.springframework.dao.DataIntegrityViolationException.class, () ->
                 projectService.createProject(projectRequest));

@@ -47,7 +47,7 @@ public class ProjectServiceImp implements ProjectService {
     }
 
     @Override
-    @PreAuthorize("@projectSecurity.isOwner(authentication, #id)")
+    @PreAuthorize("@projectSecurity.isProjectOwner(authentication, #id)")
     public void deleteProject(Long id) {
 
         projectRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
@@ -92,7 +92,7 @@ public class ProjectServiceImp implements ProjectService {
     }
 
     @Override
-    @PreAuthorize("@projectSecurity.isOwner(authentication, #id)")
+    @PreAuthorize("@projectSecurity.isProjectOwner(authentication, #id)")
     public TaskResponse createTaskInProject(Long id, TaskRequest taskRequest) {
 
         Project project = projectRepository.findById(id)

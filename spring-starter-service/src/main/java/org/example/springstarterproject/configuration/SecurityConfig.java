@@ -9,6 +9,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -56,6 +57,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/v1/openApi.yaml/swagger-config",
                                 "/api/v1/openApi.yaml").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/tasks/**").permitAll() // TEMPORARY!
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth.jwt(Customizer.withDefaults()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

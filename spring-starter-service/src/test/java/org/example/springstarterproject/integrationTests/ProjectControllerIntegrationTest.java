@@ -19,7 +19,10 @@ public class ProjectControllerIntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void SetUp() {
-        this.projectsApi = new ProjectsApi(getApiClient());
+
+        String accessToken = loginAndGetToken("demo@example.com", "demo");
+
+        this.projectsApi = new ProjectsApi(getApiClient(accessToken));
     }
 
     @Test

@@ -29,7 +29,7 @@ public class TaskServiceImp implements TaskService {
     }
 
     @Override
-    @PreAuthorize("@projectSecurity.isOwner(authentication, taskRepository.findById(#id).get().getProject().getOwner().getId())")
+    @PreAuthorize("@projectSecurity.isTaskOwner(authentication, #id)")
     public void deleteTask(Long id) {
 
         Task deletedTask = taskRepository.findById(id)
@@ -48,7 +48,7 @@ public class TaskServiceImp implements TaskService {
 
     @Transactional
     @Override
-    @PreAuthorize("@projectSecurity.isOwner(authentication, taskRepository.findById(#id).get().getProject().getOwner().getId())")
+    @PreAuthorize("@projectSecurity.isTaskOwner(authentication, #id)")
     public TaskResponse updateTask(Long id, TaskRequest taskRequest) {
 
         Task task = taskRepository.findById(id)

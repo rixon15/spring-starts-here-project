@@ -18,8 +18,11 @@ public class UserControllerIntegrationTest extends BaseIntegrationTest {
 
 
     @BeforeEach
-    public void setup() {
-        this.usersApi = new UsersApi(getApiClient());
+    void SetUp() {
+
+        String accessToken = loginAndGetToken("demo@example.com", "demo");
+
+        this.usersApi = new UsersApi(getApiClient(accessToken));
     }
 
     @Test
