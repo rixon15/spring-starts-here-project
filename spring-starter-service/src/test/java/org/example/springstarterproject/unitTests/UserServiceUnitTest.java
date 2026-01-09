@@ -104,7 +104,7 @@ public class UserServiceUnitTest {
             when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
             assertThrows(EntityNotFoundException.class, () ->
-                    userService.getUserById(anyLong()));
+                    userService.getUserById(1L));
 
             verify(userRepository, times(1)).findById(anyLong());
             verify(userMapper, never()).toDto(user);
@@ -125,7 +125,7 @@ public class UserServiceUnitTest {
             when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
             assertThrows(EntityNotFoundException.class, () ->
-                    userService.updateUser(anyLong(), userUpdateRequest));
+                    userService.updateUser(1L, userUpdateRequest));
 
         }
 
@@ -140,7 +140,7 @@ public class UserServiceUnitTest {
             when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
 
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
-                    userService.updateUser(anyLong(), userUpdateRequest));
+                    userService.updateUser(1L, userUpdateRequest));
 
             assertEquals("Username cannot be whitespace", ex.getMessage());
         }
@@ -161,7 +161,7 @@ public class UserServiceUnitTest {
             when(userRepository.existsByEmail(newEmail)).thenReturn(true);
 
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
-                    userService.updateUser(anyLong(), userUpdateRequest));
+                    userService.updateUser(1L, userUpdateRequest));
 
             assertEquals("Email already in use", ex.getMessage());
 

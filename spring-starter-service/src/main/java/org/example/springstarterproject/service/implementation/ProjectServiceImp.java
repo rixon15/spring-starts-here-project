@@ -20,7 +20,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ProjectServiceImp implements ProjectService {
@@ -43,7 +42,7 @@ public class ProjectServiceImp implements ProjectService {
     public List<ProjectResponse> getAllProjects() {
         return projectRepository.findAll()
                 .stream().map(projectMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -88,7 +87,7 @@ public class ProjectServiceImp implements ProjectService {
 
         List<Task> tasks = taskRepository.findTaskByProject_Id(id);
 
-        return tasks.stream().map(taskMapper::toDto).collect(Collectors.toList());
+        return tasks.stream().map(taskMapper::toDto).toList();
     }
 
     @Override

@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
-public class SecurityIntegrationTest extends BaseIntegrationTest {
+class SecurityIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private MockMvc mvc;
@@ -22,13 +22,13 @@ public class SecurityIntegrationTest extends BaseIntegrationTest {
     @DisplayName("Public Endpoints: Should allow access to register and login without token")
     void publicEndpointsWork() throws Exception {
         mvc.perform(post("/api/v1/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"username\":\"test\", \"email\":\"test@test.com\", \"password\":\"password\"}"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"test\", \"email\":\"test@test.com\", \"password\":\"password\"}"))
                 .andExpect(status().isCreated());
 
         mvc.perform(post("/api/v1/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"email\":\"demo@example.com\", \"password\":\"demo\"}"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"demo@example.com\", \"password\":\"demo\"}"))
                 .andExpect(status().isOk());
     }
 
@@ -79,8 +79,8 @@ public class SecurityIntegrationTest extends BaseIntegrationTest {
     @DisplayName("Login: Should return 200 and set a secure, http only refresh token cookie")
     void LoginSetsSecureCookie() throws Exception {
         mvc.perform(post("/api/v1/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"email\":\"demo@example.com\", \"password\":\"demo\"}"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"demo@example.com\", \"password\":\"demo\"}"))
                 .andExpect(status().isOk())
                 .andExpect(cookie().exists("refresh_token"))
                 .andExpect(cookie().httpOnly("refresh_token", true))
@@ -103,8 +103,8 @@ public class SecurityIntegrationTest extends BaseIntegrationTest {
     @DisplayName("Create Project: Should automatically assign the logged-in user as owner of the project")
     void createProjectAssignsCurrentOwner() throws Exception {
         mvc.perform(post("/api/v1/projects")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"name\":\"New Sec Project\", \"description\":\"Testing ownership\"}"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"New Sec Project\", \"description\":\"Testing ownership\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("New Sec Project"))
                 .andExpect(jsonPath("$.ownerId").value(1));

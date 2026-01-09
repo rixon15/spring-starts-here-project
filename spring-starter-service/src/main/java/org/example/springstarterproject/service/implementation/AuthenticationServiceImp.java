@@ -41,6 +41,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
     private final JwtDecoder jwtDecoder;
     private final UserDetailsService userDetailsService;
     private final TokenBlacklistService tokenBlacklistService;
+    private final String refreshTokenName;
 
     public AuthenticationServiceImp(AuthenticationManager authenticationManager, TokenService tokenService, UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder, RoleRepository roleRepository, JwtDecoder jwtDecoder, UserDetailsService userDetailsService, TokenBlacklistService tokenBlacklistService) {
         this.authenticationManager = authenticationManager;
@@ -52,6 +53,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
         this.jwtDecoder = jwtDecoder;
         this.userDetailsService = userDetailsService;
         this.tokenBlacklistService = tokenBlacklistService;
+        this.refreshTokenName = "refresh_token";
     }
 
     @Override
@@ -131,11 +133,11 @@ public class AuthenticationServiceImp implements AuthenticationService {
 
     @Override
     public ResponseCookie createRefreshTokenCookie(String refreshToken) {
-        return ResponseCookie.from("refresh_token", refreshToken)
+        return ResponseCookie.from(refreshTokenName, refreshToken)
                 .httpOnly(true)
                 .secure(true)
                 .path("/api/v1/auth/")
-                .maxAge(5 * 24 * 60 * 60)
+                .maxAge(5 * 24 * 60 * (long)60)
                 .sameSite("Strict")
                 .build();
     }
@@ -149,7 +151,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
             tokenBlacklistService.blacklistToken(refreshToken);
         }
 
-        return ResponseCookie.from("refresh_token", "")
+        return ResponseCookie.from(refreshTokenName, "")
                 .httpOnly(true)
                 .secure(true)
                 .path("/api/v1/auth/")
@@ -164,7 +166,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
         }
 
         return Arrays.stream(request.getCookies())
-                .filter(cookie -> "refresh_token".equals(cookie.getName()))
+                .filter(cookie -> refreshTokenName.equals(cookie.getName()))
                 .map(Cookie::getValue)
                 .findFirst()
                 .orElse(null);

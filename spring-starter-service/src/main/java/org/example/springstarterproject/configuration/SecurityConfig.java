@@ -1,6 +1,5 @@
 package org.example.springstarterproject.configuration;
 
-import org.example.springstarterproject.model.User;
 import org.example.springstarterproject.service.AuthenticationService;
 import org.example.springstarterproject.service.TokenService;
 import org.example.springstarterproject.service.UserService;
@@ -71,7 +70,7 @@ public class SecurityConfig {
             OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
             String email = oAuth2User.getAttribute("email");
 
-            User user = userService.processOAuthLogin(email);
+            userService.processOAuthLogin(email);
 
             String accessToken = tokenService.generateAccessToken(authentication);
             String refreshToken = tokenService.generateRefreshToken(authentication);
