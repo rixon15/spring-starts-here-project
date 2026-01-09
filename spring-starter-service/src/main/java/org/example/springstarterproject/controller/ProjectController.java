@@ -6,7 +6,7 @@ import com.example.models.ProjectResponse;
 import com.example.models.TaskRequest;
 import com.example.models.TaskResponse;
 import jakarta.validation.Valid;
-import org.example.springstarterproject.service.implementation.ProjectServiceImp;
+import org.example.springstarterproject.service.ProjectService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +17,9 @@ import java.util.List;
 @RequestMapping("/projects")
 public class ProjectController implements ProjectsApi {
 
-    private final ProjectServiceImp projectService;
+    private final ProjectService projectService;
 
-    public ProjectController(ProjectServiceImp projectService) {
+    public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
     }
 

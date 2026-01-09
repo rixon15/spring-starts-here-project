@@ -10,6 +10,7 @@ import org.example.springstarterproject.repository.TaskRepository;
 import org.example.springstarterproject.repository.UserRepository;
 import org.example.springstarterproject.service.TaskService;
 import org.openapitools.jackson.nullable.JsonNullable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -28,9 +29,8 @@ public class TaskServiceImp implements TaskService {
     }
 
     @Override
+    @PreAuthorize("@projectSecurity.isTaskOwner(authentication, #id)")
     public void deleteTask(Long id) {
-
-        //TODO: User has to be the owner of the project we want to delete
 
         Task deletedTask = taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(id));
@@ -48,9 +48,8 @@ public class TaskServiceImp implements TaskService {
 
     @Transactional
     @Override
+    @PreAuthorize("@projectSecurity.isTaskOwner(authentication, #id)")
     public TaskResponse updateTask(Long id, TaskRequest taskRequest) {
-
-        //TODO: if current User is not the owner of the project the task belongs to
 
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(id));

@@ -20,8 +20,11 @@ public class TaskControllerIntegrationTest extends BaseIntegrationTest {
     private TasksApi tasksApi;
 
     @BeforeEach
-    void setup() {
-        tasksApi = new TasksApi(getApiClient());
+    void SetUp() {
+
+        String accessToken = loginAndGetToken("demo@example.com", "demo");
+
+        this.tasksApi = new TasksApi(getApiClient(accessToken));
     }
 
     @Test

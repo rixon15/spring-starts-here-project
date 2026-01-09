@@ -32,3 +32,8 @@ build/
 
 ### VS Code ###
 .vscode/
+/spring-starter-service/src/main/resources/certs/public_key.pem
+/spring-starter-service/src/main/resources/certs/private_key.pem
+/spring-starter-service/src/main/resources/certs/private.pem
+/cookies_backup.txt
+/cookies.txt

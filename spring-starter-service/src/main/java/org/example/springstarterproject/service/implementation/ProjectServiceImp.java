@@ -12,7 +12,11 @@ import org.example.springstarterproject.model.Task;
 import org.example.springstarterproject.model.User;
 import org.example.springstarterproject.repository.ProjectRepository;
 import org.example.springstarterproject.repository.TaskRepository;
+import org.example.springstarterproject.repository.UserRepository;
 import org.example.springstarterproject.service.ProjectService;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,12 +29,14 @@ public class ProjectServiceImp implements ProjectService {
     private final ProjectMapper projectMapper;
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
+    private final UserRepository userRepository;
 
-    public ProjectServiceImp(ProjectRepository projectRepository, ProjectMapper projectMapper, TaskRepository taskRepository, TaskMapper taskMapper) {
+    public ProjectServiceImp(ProjectRepository projectRepository, ProjectMapper projectMapper, TaskRepository taskRepository, TaskMapper taskMapper, UserRepository userRepository) {
         this.projectRepository = projectRepository;
         this.projectMapper = projectMapper;
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -41,9 +47,8 @@ public class ProjectServiceImp implements ProjectService {
     }
 
     @Override
+    @PreAuthorize("@projectSecurity.isProjectOwner(authentication, #id)")
     public void deleteProject(Long id) {
-
-        //TODO: User has to be the owner of the project
 
         projectRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
 
@@ -64,8 +69,12 @@ public class ProjectServiceImp implements ProjectService {
     public ProjectResponse createProject(ProjectRequest projectRequest) {
         Project project = projectMapper.fromDto(projectRequest);
 
-        // TODO: Set the owner of the project to the currently logged in user
-        project.setOwner(new User(1));
+        Authentication authentication =  SecurityContextHolder.getContext().getAuthentication();
+
+        User currentUser = userRepository.findByEmail(authentication.getName())
+                        .orElseThrow(() -> new RuntimeException("Something went wrong with user: " +  authentication.getName()));
+
+        project.setOwner(currentUser);
 
         return projectMapper.toDto(projectRepository.save(project));
     }
@@ -83,9 +92,8 @@ public class ProjectServiceImp implements ProjectService {
     }
 
     @Override
+    @PreAuthorize("@projectSecurity.isProjectOwner(authentication, #id)")
     public TaskResponse createTaskInProject(Long id, TaskRequest taskRequest) {
-
-        //TODO: If current user is not the owner of the project the task has to be created in
 
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(id));

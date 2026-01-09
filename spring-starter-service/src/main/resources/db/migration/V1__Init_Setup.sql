@@ -48,6 +48,14 @@ CREATE TABLE users
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
+CREATE TABLE blacklisted_tokens (
+                                    id BIGSERIAL PRIMARY KEY,
+                                    token TEXT NOT NULL UNIQUE,
+                                    expiry_date TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+CREATE INDEX idx_blacklisted_token_expiry ON blacklisted_tokens(expiry_date);
+
 ALTER TABLE projects
     ADD CONSTRAINT FK_PROJECTS_ON_OWNER FOREIGN KEY (owner_id) REFERENCES users (id);
 

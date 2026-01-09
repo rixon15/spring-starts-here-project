@@ -1,14 +1,19 @@
 package org.example.springstarterproject.configuration;
 
 import com.example.models.Error;
+import org.apache.tomcat.websocket.AuthenticationException;
 import org.example.springstarterproject.exception.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.nio.file.AccessDeniedException;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -31,7 +36,7 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Error> handleJsonErrors(HttpMessageNotReadableException ex) {
+    public ResponseEntity<Error> handleJsonErrors() {
 
         Error errorResponse = new Error();
         errorResponse.setCode(HttpStatus.BAD_REQUEST.value());
@@ -52,13 +57,55 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Error> handleGeneralExceptions(Exception ex) {
+    public ResponseEntity<Error> handleGeneralExceptions() {
 
         Error errorResponse = new Error();
         errorResponse.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
         errorResponse.setMessage("An unexpected error occurred.");
 
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Error> handleBadCredentialsException(BadCredentialsException ex) {
+        Error errorResponse = new Error();
+        errorResponse.setCode(HttpStatus.UNAUTHORIZED.value());
+        errorResponse.setMessage("Authentication failed: " + ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<Error> handleDisabledException() {
+        Error errorResponse = new Error();
+        errorResponse.setCode(HttpStatus.FORBIDDEN.value());
+        errorResponse.setMessage("Your account has been disabled");
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Error> handleAuthenticationException(AuthenticationException ex) {
+        Error errorResponse = new Error();
+        errorResponse.setCode(HttpStatus.UNAUTHORIZED.value());
+        errorResponse.setMessage("Authentication failed: " + ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(MissingRequestCookieException.class)
+    public ResponseEntity<Error> handleMissingRequestCookieException() {
+        Error errorResponse = new Error();
+        errorResponse.setCode(HttpStatus.UNAUTHORIZED.value());
+        errorResponse.setMessage("Session expired or invalid. Please login again");
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler({AccessDeniedException.class, org.springframework.security.authorization.AuthorizationDeniedException.class})
+    public ResponseEntity<Error> handleAccessDeniedException(Exception ex) {
+        Error errorResponse = new Error();
+        errorResponse.setCode(HttpStatus.FORBIDDEN.value());
+        errorResponse.setMessage("Access Denied: You don't have permission to perform this action");
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
 
 }
