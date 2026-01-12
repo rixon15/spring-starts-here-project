@@ -26,11 +26,6 @@ public class UserRole {
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-//    public UserRole(User user, Role role) {
-//        this.user = user;
-//        this.role = role;
-//        this.id = new UserRoleKey(user.getId(), role.getId());
-//    }
 
     @Override
     public boolean equals(Object obj) {

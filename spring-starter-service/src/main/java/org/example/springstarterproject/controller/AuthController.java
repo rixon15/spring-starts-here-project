@@ -13,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 
 @RestController
@@ -37,7 +35,6 @@ public class AuthController implements AuthApi {
 
         AuthResponse authResponse = authenticationService.login(loginRequest.getEmail(), loginRequest.getPassword());
 
-//        response.addHeader(HttpHeaders.SET_COOKIE, authenticationService.createRefreshTokenCookie(authResponse.getRefreshToken()).toString());
 
         //Workaround so I don't have to mess with the openAPI.yaml to get a HttpServletResponse into the methode signature
         HttpServletResponse response = request.getNativeResponse(HttpServletResponse.class);
@@ -54,13 +51,13 @@ public class AuthController implements AuthApi {
     @Override
     public ResponseEntity<Void> logoutUser() {
 
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-        HttpServletRequest request = attributes.getRequest();
-        HttpServletResponse response = attributes.getResponse();
+
+        HttpServletRequest httpReq = request.getNativeRequest(HttpServletRequest.class);
+        HttpServletResponse httpResp = request.getNativeResponse(HttpServletResponse.class);
 
 
-        if (response != null) {
-            response.addHeader(HttpHeaders.SET_COOKIE, authenticationService.deleteCookie(request).toString());
+        if (httpResp != null && httpReq != null) {
+            httpResp.addHeader(HttpHeaders.SET_COOKIE, authenticationService.deleteCookie(httpReq).toString());
         }
 
         return new ResponseEntity<>(HttpStatus.OK);

@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ProjectServiceUnitTest {
+class ProjectServiceUnitTest {
 
     @Mock
     ProjectRepository projectRepository;
@@ -51,7 +51,7 @@ public class ProjectServiceUnitTest {
 
     @Test
     @DisplayName("getAllProjects: Should return a list of projects")
-    public void getAllProjects_HappyFlow() {
+    void getAllProjects_HappyFlow() {
         Project project = new Project();
         ProjectResponse projectResponse = new ProjectResponse();
 
@@ -68,7 +68,7 @@ public class ProjectServiceUnitTest {
 
     @Test
     @DisplayName("getAllProjects: Should return an empty list when project doesnt exist or has no tasks")
-    public void getAllProjects_ValidExecution() {
+    void getAllProjects_ValidExecution() {
 
         when(projectRepository.findAll()).thenReturn(Collections.emptyList());
 
@@ -83,7 +83,7 @@ public class ProjectServiceUnitTest {
 
     @Test
     @DisplayName("deleteProject: Should call repository and delete project if it exists")
-    public void deleteProject_HappyFlow() {
+    void deleteProject_HappyFlow() {
         Project project = new Project();
         project.setId(1L);
 
@@ -98,7 +98,7 @@ public class ProjectServiceUnitTest {
 
     @Test
     @DisplayName("deleteProject: Should throw EntityNotFoundException if the project doesn't exist")
-    public void deleteProject_Exception_ProjectDoesNotExist() {
+    void deleteProject_Exception_ProjectDoesNotExist() {
         when(projectRepository.findById(any())).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> projectService.deleteProject(99L));
@@ -108,7 +108,7 @@ public class ProjectServiceUnitTest {
 
     @Test
     @DisplayName("getProjectById: Should return project with given id")
-    public void getProjectById_HappyFlow() {
+    void getProjectById_HappyFlow() {
 
         Project project = new Project();
         project.setId(1L);
@@ -127,7 +127,7 @@ public class ProjectServiceUnitTest {
 
     @Test
     @DisplayName("getProjectById: Should throw EntityNotFoundException when project with id doesn't exist")
-    public void getProjectById_Exception_ProjectDoesNotExist() {
+    void getProjectById_Exception_ProjectDoesNotExist() {
 
         Project project = new Project();
 
@@ -141,7 +141,7 @@ public class ProjectServiceUnitTest {
 
     @Test
     @DisplayName("createProject: Should return newly created project")
-    public void createProject_HappyFlow() {
+    void createProject_HappyFlow() {
 
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
@@ -167,7 +167,6 @@ public class ProjectServiceUnitTest {
         when(userRepository.findByEmail("demo@example.com")).thenReturn(Optional.of(mockUser));
 
 
-
         SecurityContextHolder.setContext(securityContext);
         ProjectResponse result = projectService.createProject(projectRequest);
 
@@ -185,7 +184,7 @@ public class ProjectServiceUnitTest {
 
     @Test
     @DisplayName("createProject: Should throw exception when db fails")
-    public void createProject_Exception_dbFails() {
+    void createProject_Exception_dbFails() {
         String name = "Project";
         ProjectRequest projectRequest = new ProjectRequest();
         projectRequest.setName(name);
@@ -217,7 +216,7 @@ public class ProjectServiceUnitTest {
 
     @Test
     @DisplayName("getAllTasks: Should return all tasks for given project by id")
-    public void getAllTasks_HappyFlow() {
+    void getAllTasks_HappyFlow() {
 
         Task task = new Task();
         task.setId(1L);
@@ -243,7 +242,7 @@ public class ProjectServiceUnitTest {
 
     @Test
     @DisplayName("getAllTasks: Should return empty list if there are no tasks associated with the given project id")
-    public void getAllTasks_ValidExecution() {
+    void getAllTasks_ValidExecution() {
 
         Project project = new Project();
 
@@ -261,7 +260,7 @@ public class ProjectServiceUnitTest {
 
     @Test
     @DisplayName("getAllTasks: Should throw EntityNotFoundException when project with id doesn't exit")
-    public void getAllTasks_Exception_ProjectDoesNotExit() {
+    void getAllTasks_Exception_ProjectDoesNotExit() {
 
         when(projectRepository.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -274,7 +273,7 @@ public class ProjectServiceUnitTest {
 
     @Test
     @DisplayName("createTaskInProject: Should return created task as a TaskResponse")
-    public void createTaskInProject_HappyPath() {
+    void createTaskInProject_HappyPath() {
         TaskRequest taskRequest = new TaskRequest();
         taskRequest.setTitle("Title");
         Project project = new Project();
@@ -301,11 +300,13 @@ public class ProjectServiceUnitTest {
 
     @Test
     @DisplayName("createTaskInProject: Should throw EntityNotFoundException when project with the given id doesn't exist")
-    public void createTaskInProject_Exception_ProjectDoesNotExist() {
+    void createTaskInProject_Exception_ProjectDoesNotExist() {
+
+        TaskRequest taskRequest = new TaskRequest();
 
         when(projectRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> projectService.createTaskInProject(1L, new TaskRequest()));
+        assertThrows(EntityNotFoundException.class, () -> projectService.createTaskInProject(1L, taskRequest));
 
         verify(taskMapper, never()).fromDto(any());
         verify(taskMapper, never()).toDto(any());

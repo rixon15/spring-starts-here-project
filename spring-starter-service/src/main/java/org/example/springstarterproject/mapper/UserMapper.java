@@ -12,7 +12,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface UserMapper {
@@ -53,6 +52,6 @@ public interface UserMapper {
 
                     return dtoRole;
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 }

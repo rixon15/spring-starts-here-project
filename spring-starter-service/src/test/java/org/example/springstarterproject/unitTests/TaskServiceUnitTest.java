@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class TaskServiceUnitTest {
+class TaskServiceUnitTest {
 
     @Mock
     TaskRepository taskRepository;
@@ -39,7 +39,7 @@ public class TaskServiceUnitTest {
 
     @Test
     @DisplayName("deleteTask: Should delete task with given id")
-    public void deleteTask_HappyPath() {
+    void deleteTask_HappyPath() {
 
         Task task = new Task();
 
@@ -54,11 +54,11 @@ public class TaskServiceUnitTest {
 
     @Test
     @DisplayName("deleteTask: Should throw EntityNotFoundException if Task doesn't exist")
-    public void deleteTask_Exception_TaskDoesNotExist() {
+    void deleteTask_Exception_TaskDoesNotExist() {
 
         when(taskRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> taskService.deleteTask(anyLong()));
+        assertThrows(EntityNotFoundException.class, () -> taskService.deleteTask(1L));
 
         verify(taskRepository, times(1)).findById(anyLong());
         verify(taskRepository, never()).delete(any());
@@ -67,7 +67,7 @@ public class TaskServiceUnitTest {
 
     @Test
     @DisplayName("getTaskById: Should return a task with the given id")
-    public void getTaskById_HappyPath() {
+    void getTaskById_HappyPath() {
 
         Task task = new Task();
         task.setId(1);
@@ -98,7 +98,7 @@ public class TaskServiceUnitTest {
 
             when(taskRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-            assertThrows(EntityNotFoundException.class, () -> taskService.updateTask(anyLong(), taskRequest));
+            assertThrows(EntityNotFoundException.class, () -> taskService.updateTask(1L, taskRequest));
 
         }
 
@@ -111,7 +111,7 @@ public class TaskServiceUnitTest {
 
             when(taskRepository.findById(anyLong())).thenReturn(Optional.of(task));
 
-            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> taskService.updateTask(anyLong(), taskRequest));
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> taskService.updateTask(1L, taskRequest));
 
             assertEquals("Task title cannot be whitespace", exception.getMessage());
 
@@ -127,7 +127,7 @@ public class TaskServiceUnitTest {
 
             when(taskRepository.findById(anyLong())).thenReturn(Optional.of(task));
 
-            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> taskService.updateTask(anyLong(), taskRequest));
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> taskService.updateTask(1L, taskRequest));
 
             assertEquals("Task description cannot be whitespace", exception.getMessage());
 
@@ -143,7 +143,7 @@ public class TaskServiceUnitTest {
 
             when(taskRepository.findById(anyLong())).thenReturn(Optional.of(task));
 
-            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> taskService.updateTask(anyLong(), taskRequest));
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> taskService.updateTask(1L, taskRequest));
 
             assertEquals("Due date cannot be in the past", exception.getMessage());
 
@@ -166,7 +166,9 @@ public class TaskServiceUnitTest {
             when(taskRepository.findById(anyLong())).thenReturn(Optional.of(task));
             when(userRepository.existsById(anyLong())).thenReturn(false);
 
-            assertThrows(EntityNotFoundException.class, () -> taskService.updateTask(anyLong(), taskRequest));
+            Long testNum = anyLong();
+
+            assertThrows(EntityNotFoundException.class, () -> taskService.updateTask(testNum, taskRequest));
 
         }
 

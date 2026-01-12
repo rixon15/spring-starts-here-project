@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImp implements UserService {
@@ -27,7 +26,7 @@ public class UserServiceImp implements UserService {
 
     @Override
     public List<UserResponse> getAllUsers() {
-        return userRepository.findAll().stream().map(userMapper::toDto).collect(Collectors.toList());
+        return userRepository.findAll().stream().map(userMapper::toDto).toList();
     }
 
     @Override
@@ -47,11 +46,10 @@ public class UserServiceImp implements UserService {
 
         if (userUpdateRequest.getEmail() != null
                 && !userUpdateRequest.getEmail().isBlank()
-                && !userUpdateRequest.getEmail().equals(user.getEmail())) {
+                && !userUpdateRequest.getEmail().equals(user.getEmail())
+                && userRepository.existsByEmail(userUpdateRequest.getEmail())) {
 
-            if (userRepository.existsByEmail(userUpdateRequest.getEmail())) {
-                throw new IllegalArgumentException("Email already in use");
-            }
+            throw new IllegalArgumentException("Email already in use");
         }
 
         if (userUpdateRequest.getUsername() != null && userUpdateRequest.getUsername().isBlank()) {
